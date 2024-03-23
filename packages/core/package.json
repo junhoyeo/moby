@@ -2,7 +2,7 @@
   "name": "@moby/core",
   "author": "Junho Yeo <i@junho.io>",
   "scripts": {
-    "start": "tsx src/index.ts",
+    "start": "ts-node src/index",
     "format": "prettier --write ."
   },
   "dependencies": {
@@ -14,7 +14,7 @@
     "@types/crypto-js": "^4.2.2",
     "@types/merkle": "^0.6.4",
     "@types/node": "^20.11.30",
-    "tsx": "^4.7.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.3"
   }
 }

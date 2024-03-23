@@ -8,19 +8,20 @@ import {
   RemoveServerRequest,
   RequestVoteRequest,
   RequestVoteResponse,
-} from "@/dtos";
-import { Command } from "./Command";
-import { Query } from "./Query";
+} from '@/dtos';
+
+import { Query } from './Query';
+import { Command } from './command';
 
 export interface PeerConnection {
   peerId: string;
   requestVote(
     request: RequestVoteRequest,
-    callback: (response: RequestVoteResponse) => void
+    callback: (response: RequestVoteResponse) => void,
   ): void;
   appendEntries(
     request: AppendEntryRequest,
-    callback: (response: AppendEntryResponse) => void
+    callback: (response: AppendEntryResponse) => void,
   ): void;
 
   // used by clients/admins

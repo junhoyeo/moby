@@ -1,12 +1,12 @@
 import {
   MemoryNetwork,
   MemoryServer,
-} from '@moby/raft/adapters/network/memory';
-import { LocalStateManager } from '@moby/raft/adapters/state';
-import { RaftNode } from '@moby/raft/core';
-import { ClientQueryResponse } from '@moby/raft/dtos';
-import { CommandType, QueryType } from '@moby/raft/interfaces';
-import { sleep } from '@moby/raft/utils';
+} from '@moby/raft/dist/adapters/network/memory';
+import { LocalStateManager } from '@moby/raft/dist/adapters/state';
+import { RaftNode } from '@moby/raft/dist/core';
+import { ClientQueryResponse } from '@moby/raft/dist/dtos';
+import { CommandType, QueryType } from '@moby/raft/dist/interfaces';
+import { sleep } from '@moby/raft/dist/utils';
 
 import { Chain as Blockchain } from './chain';
 

@@ -2,10 +2,12 @@
   "name": "@moby/raft",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "jest  --collect-coverage",
-    "start": "ts-node index.ts"
+    "start": "ts-node index.ts",
+    "build": "rimraf ./dist && swc . --config-file .swcrc -d dist && tsc --emitDeclarationOnly"
   },
   "repository": {
     "type": "git",
@@ -26,8 +28,11 @@
   "devDependencies": {
     "@babel/core": "^7.24.3",
     "@babel/preset-typescript": "^7.23.3",
+    "@swc/cli": "^0.3.10",
+    "@swc/core": "^1.4.8",
     "@types/jest": "^29.5.8",
     "@types/node": "^20.11.30",
+    "rimraf": "^5.0.5",
     "typescript": "^5.4.3"
   },
   "_moduleAliases": {

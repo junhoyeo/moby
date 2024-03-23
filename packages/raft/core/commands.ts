@@ -1,9 +1,9 @@
-import { Command, CommandType } from "@/interfaces/Command";
+import { Command, CommandType } from '@/interfaces/command';
 
 export function noOpCMD(nodeId: string): Command<string> {
   return {
     type: CommandType.NOOP,
-    data: "NO-OP-" + nodeId,
+    data: 'NO-OP-' + nodeId,
   };
 }
 
