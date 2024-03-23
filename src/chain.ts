@@ -1,4 +1,4 @@
-import { Block, BlockHeader, IBlock, IBlockHeader } from './block';
+import { Block, BlockHeader, IBlockHeader } from './block';
 
 export class Chain {
   chain: Block[];
@@ -26,7 +26,7 @@ export class Chain {
     return this.chain[this.chain.length - 1];
   }
 
-  addBlock(data: any[]): void {
+  addBlock(data: any[]): Block {
     const previousBlock = this.getLatestBlock();
     const newHeight = previousBlock.height + 1;
     const newHeader: IBlockHeader = {
@@ -37,6 +37,7 @@ export class Chain {
     };
     const newBlock = new Block(newHeader, data);
     this.chain.push(newBlock);
+    return newBlock;
   }
 
   isChainValid(): boolean {

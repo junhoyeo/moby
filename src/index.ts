@@ -1,15 +1,14 @@
-import { Block, BlockHeader, IBlock, IBlockHeader } from './block';
+import { MemoryNetwork, MemoryServer } from '@/adapters/network/memory';
+import { LocalStateManager } from '@/adapters/state';
+import { MemoryCluster } from '@/clusters/memory.cluster';
+import { RaftNode } from '@/core';
+import { ClientQueryResponse } from '@/dtos';
+import { CommandType, QueryType } from '@/interfaces';
+import { sleep } from '@/utils';
+
 import { Chain as Blockchain } from './chain';
-import { MemoryNetwork, MemoryServer } from './tf-raft/adapters/network/memory';
-import { LocalStateManager } from './tf-raft/adapters/state';
-import { MemoryCluster } from './tf-raft/clusters/memory.cluster';
-import { RaftNode } from './tf-raft/core';
-import { PeerConnection } from './tf-raft/interfaces';
-import { CommandType, QueryType } from './tf-raft/interfaces';
-import { sleep } from './tf-raft/utils';
 
 const NODES_NUMBER = 3;
-const MIN_STAKE = 100;
 
 interface Account {
   address: string;
@@ -25,7 +24,6 @@ const accounts: Account[] = [
 
 const main = async () => {
   const blockchain = new Blockchain();
-  const cluster = new MemoryCluster(NODES_NUMBER);
   const network = MemoryNetwork.getTestNetwork();
   // 1
   const server1 = new MemoryServer();
@@ -48,73 +46,85 @@ const main = async () => {
 
   await sleep(300);
 
-  await server1.ClientRequest({
-    type: CommandType.STORE_SET,
-    data: { key: 'testing', value: 'SHOULD_EQUAL1' },
-  });
+  let block = blockchain.createGenesisBlock();
+  let queryResponse: ClientQueryResponse;
 
-  await sleep(500);
+  for (let i = 0; i < 10; i++) {
+    if (i > 0) {
+      block = blockchain.addBlock([]);
+    }
 
-  const queryResponse = server1.ClientQuery({
-    type: QueryType.GET,
-    data: { key: 'testing' },
-  });
-  console.log({ queryResponse });
-  // expect(queryResponse.response).toEqual('SHOULD_EQUAL1');
+    // create block
+    await server1.ClientRequest({
+      type: CommandType.STORE_SET,
+      data: { key: block.height.toString(), value: JSON.stringify(block) },
+    });
 
-  await server1.ClientRequest({
-    type: CommandType.STORE_DEL,
-    data: { key: 'testing' },
-  });
+    await sleep(500);
 
-  await sleep(500);
-
-  const queryResponse2 = server1.ClientQuery({
-    type: QueryType.GET,
-    data: { key: 'testing' },
-  });
-  console.log({ queryResponse2 });
-  // expect(queryResponse2.response).toEqual('');
+    // query block
+    queryResponse = server1.ClientQuery({
+      type: QueryType.GET,
+      data: { key: block.height.toString() },
+    });
+    console.log({ queryResponse });
+  }
 
   node1.stopListeners();
+
+  // node1.stopListeners();
+  server1.RemoveServer({ oldServer: 'NODE1' });
+  network.removeServerFromNode('NODE1', { oldServer: 'NODE1' });
+  await sleep(1000);
+
+  block = blockchain.addBlock([]);
+  let r = await server1.ClientRequest({
+    type: CommandType.STORE_SET,
+    data: { key: block.height.toString(), value: JSON.stringify(block) },
+  });
+  console.log(r);
+
+  r = await server2.ClientRequest({
+    type: CommandType.STORE_SET,
+    data: { key: block.height.toString(), value: JSON.stringify(block) },
+  });
+  console.log(r);
+
+  r = await server3.ClientRequest({
+    type: CommandType.STORE_SET,
+    data: { key: block.height.toString(), value: JSON.stringify(block) },
+  });
+  console.log(r);
+
+  server1.RemoveServer({ oldServer: 'NODE1' });
+  network.removeServerFromNode('NODE1', { oldServer: 'NODE1' });
+  await sleep(500);
+
+  queryResponse = server1.ClientQuery({
+    type: QueryType.GET,
+    data: { key: block.height.toString() },
+  });
+  console.log({ queryResponse });
+  queryResponse = server2.ClientQuery({
+    type: QueryType.GET,
+    data: { key: block.height.toString() },
+  });
+  console.log({ queryResponse });
+  queryResponse = server3.ClientQuery({
+    type: QueryType.GET,
+    data: { key: block.height.toString() },
+  });
+  console.log({ queryResponse });
+
+  queryResponse = server1.ClientQuery({
+    type: QueryType.GET,
+    data: { key: block.height.toString() },
+  });
+  console.log({ queryResponse });
+
   node2.stopListeners();
   node3.stopListeners();
 
-  // async function startCluster() {
-  //   await cluster.start();
-  //   console.log('Cluster started');
-
-  //   // Execute commands on the leader node
-  //   const leaderConnection = cluster.connections[0];
-  //   // addBlock(leaderConnection, ['Transaction 1', 'Transaction 2'], 'A3');
-  //   // transfer(leaderConnection, 'A1', 'A2', 100);
-
-  //   await node1.ClientRequest({
-  //     type: CommandType.STORE_SET,
-  //     data: { key: "testing", value: "SHOULD_EQUAL1" },
-  //   });
-  // }
-
-  // function addBlock(connection: PeerConnection, data: any[], proposer: string) {
-  //   const command = `HSET block:${blockchain.chain.length} data:${JSON.stringify(data)} proposer:${proposer}`;
-  //   const response = connection.requestVote(command, (res) => {
-  //     console.log('Add block response:', res);
-  //   });
-  // }
-
-  // function transfer(
-  //   connection: PeerConnection,
-  //   from: string,
-  //   to: string,
-  //   amount: number,
-  // ) {
-  //   const command = `HSET transfer from:${from} to:${to} amount:${amount}`;
-  //   const response = connection.requestVote(command, (res) => {
-  //     console.log('Transfer response:', res);
-  //   });
-  // }
-
-  // // Start the cluster
-  // startCluster();
+  process.exit(1);
 };
 main();
