@@ -9,11 +9,7 @@ module.exports = {
     '^.+\\.ts?$': 'ts-jest',
   },
   transformIgnorePatterns: ['<rootDir>/node_modules/'],
-  moduleDirectories: ["node_modules", "<rootDir>"],
+  moduleDirectories: ['node_modules', '<rootDir>'],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths),
-  coveragePathIgnorePatterns: [
-    "./adapters/",
-  ],
+  coveragePathIgnorePatterns: ['./adapters/'],
 };
-
-

@@ -6,7 +6,7 @@
     "noImplicitAny": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/tf-raft/*"]
+      "@/*": ["./*"]
     },
     "rootDirs": ["."],
     "esModuleInterop": true,

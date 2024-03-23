@@ -1,5 +1,5 @@
 {
-  "name": "tf-raft",
+  "name": "@moby/tf-raft",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

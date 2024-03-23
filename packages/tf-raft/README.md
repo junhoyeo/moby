@@ -22,7 +22,7 @@ tf-raft implements the three core components of the RAFT Consensus Protocol:
 
 1. **Leader Election:** The process by which a leader is chosen among the nodes.
 2. **Log Replication:** Ensuring that the logs across nodes are consistent through replication.
-3. **Cluster Membership Changes (one member at a time):** Handling dynamic changes in the cluster, such as adding or removing nodes 
+3. **Cluster Membership Changes (one member at a time):** Handling dynamic changes in the cluster, such as adding or removing nodes
 
 The core of tf-raft is fully isolated and independent from the infrastructure, relying on ports and adapters for high flexibility.
 tf-raft currently supports `gRPC` and `In-Memory` adapters for the network layer & `In-Memory` and `JSON-Based` adapters for volatile and non-volatile states, respectively.
@@ -85,7 +85,6 @@ Within the context of tf-raft, the term "peers" refers to the clients of a node.
 
 Let's say we want to create a node using the `Memory` Protocol, this can be achieved by firstly creating the adapters, `MemoryServer` and `LocalStateManager` then inject it into the RaftNode create method.
 
-
 ```ts
 export class MemoryCluster implements RaftCluster {
   constructor(private nodesNumber: number) {
@@ -97,40 +96,28 @@ export class MemoryCluster implements RaftCluster {
     const network = MemoryNetwork.getNetwork();
 
     // LEADER NODE
-    const nodeIdentifier1 = "NODE";
+    const nodeIdentifier1 = 'NODE';
     const server1 = new MemoryServer();
     network.addServer(nodeIdentifier1, server1);
     const state1 = new LocalStateManager(nodeIdentifier1);
-    await RaftNode.create(
-      nodeIdentifier1,
-      server1,
-      state1,
-      "MEMORY",
-      true
-    );
+    await RaftNode.create(nodeIdentifier1, server1, state1, 'MEMORY', true);
 
-    const node1Connection = PeerFactory("MEMORY", nodeIdentifier1);
+    const node1Connection = PeerFactory('MEMORY', nodeIdentifier1);
     this.connections.push(node1Connection);
     setTimeout(async () => {
-      for ( let i = 0; i < this.nodesNumber - 1; i++) {
-        const nodeIdentifier = "NODE" + i;
+      for (let i = 0; i < this.nodesNumber - 1; i++) {
+        const nodeIdentifier = 'NODE' + i;
         const server = new MemoryServer();
         network.addServer(nodeIdentifier, server);
         const state = new LocalStateManager(nodeIdentifier);
-        await RaftNode.create(
-          nodeIdentifier,
-          server,
-          state,
-          "MEMORY"
-        );
-        const nodeConnection = PeerFactory("MEMORY", nodeIdentifier);
+        await RaftNode.create(nodeIdentifier, server, state, 'MEMORY');
+        const nodeConnection = PeerFactory('MEMORY', nodeIdentifier);
         this.connections.push(nodeConnection);
         server1.AddServer({ newServer: nodeIdentifier });
       }
     }, 310);
   }
 }
-
 ```
 
 <ol>
@@ -177,6 +164,7 @@ https://github.com/iifawzi/tf-raft/blob/96d8d738b5db0b22771fda7cd909c09735eb60c6
 The foundational logic, coupled with the memory adapters, has undergone comprehensive testing using JEST, achieving near 99% test coverage.
 
 To run the tests, execute the following command:
+
 ```bash
 npm run test
 ```
