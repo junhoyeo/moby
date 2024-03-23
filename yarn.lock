@@ -32,7 +32,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:^7.11.6, @babel/core@npm:^7.12.3, @babel/core@npm:^7.23.9":
+"@babel/core@npm:^7.11.6, @babel/core@npm:^7.12.3, @babel/core@npm:^7.23.9, @babel/core@npm:^7.24.3":
   version: 7.24.3
   resolution: "@babel/core@npm:7.24.3"
   dependencies:
@@ -1029,29 +1029,30 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@moby/core@workspace:packages/core"
   dependencies:
-    "@trivago/prettier-plugin-sort-imports": "npm:^4.3.0"
-    "@types/axon": "npm:^2.0.5"
+    "@moby/raft": "workspace:^"
     "@types/crypto-js": "npm:^4.2.2"
     "@types/merkle": "npm:^0.6.4"
+    "@types/node": "npm:^20.11.30"
     crypto-js: "npm:^4.2.0"
     merkle: "npm:^0.6.0"
-    prettier: "npm:^3.2.5"
     tsx: "npm:^4.7.1"
     typescript: "npm:^5.4.3"
   languageName: unknown
   linkType: soft
 
-"@moby/raft@workspace:packages/tf-raft":
+"@moby/raft@workspace:^, @moby/raft@workspace:packages/raft":
   version: 0.0.0-use.local
-  resolution: "@moby/raft@workspace:packages/tf-raft"
+  resolution: "@moby/raft@workspace:packages/raft"
   dependencies:
+    "@babel/core": "npm:^7.24.3"
     "@babel/preset-typescript": "npm:^7.23.3"
     "@types/jest": "npm:^29.5.8"
-    "@types/node": "npm:^20.9.0"
+    "@types/node": "npm:^20.11.30"
     jest: "npm:^29.7.0"
     module-alias: "npm:^2.2.3"
     node-json-db: "npm:^2.3.0"
     ts-jest: "npm:^29.1.1"
+    typescript: "npm:^5.4.3"
   languageName: unknown
   linkType: soft
 
@@ -1126,15 +1127,6 @@ __metadata:
     "@vue/compiler-sfc":
       optional: true
   checksum: 10c0/42270fb9c89e54a3f8b6ac8c43e6d0e03350e2857e902cdad4de22c78ef1864da600525595311bc7e94e51c16c7dd3882c2e048a162fdab59761ffa893756aa2
-  languageName: node
-  linkType: hard
-
-"@types/axon@npm:^2.0.5":
-  version: 2.0.5
-  resolution: "@types/axon@npm:2.0.5"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10c0/df95908845e8e091b2a6e3dd7f83b472d7eafa22fbe8032caee7af1f1b10878e5ae391eadf37addce300b3d14a21edec273109f76676e2715476fbf90cd6c539
   languageName: node
   linkType: hard
 
@@ -1239,7 +1231,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^20.9.0":
+"@types/node@npm:*, @types/node@npm:^20.11.30":
   version: 20.11.30
   resolution: "@types/node@npm:20.11.30"
   dependencies:

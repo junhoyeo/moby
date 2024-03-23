@@ -1,10 +1,12 @@
-import { MemoryNetwork, MemoryServer } from '@/adapters/network/memory';
-import { LocalStateManager } from '@/adapters/state';
-import { MemoryCluster } from '@/clusters/memory.cluster';
-import { RaftNode } from '@/core';
-import { ClientQueryResponse } from '@/dtos';
-import { CommandType, QueryType } from '@/interfaces';
-import { sleep } from '@/utils';
+import {
+  MemoryNetwork,
+  MemoryServer,
+} from '@moby/raft/adapters/network/memory';
+import { LocalStateManager } from '@moby/raft/adapters/state';
+import { RaftNode } from '@moby/raft/core';
+import { ClientQueryResponse } from '@moby/raft/dtos';
+import { CommandType, QueryType } from '@moby/raft/interfaces';
+import { sleep } from '@moby/raft/utils';
 
 import { Chain as Blockchain } from './chain';
 

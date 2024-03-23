@@ -6,15 +6,14 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@moby/raft": "workspace:^",
     "crypto-js": "^4.2.0",
     "merkle": "^0.6.0"
   },
   "devDependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@types/axon": "^2.0.5",
     "@types/crypto-js": "^4.2.2",
     "@types/merkle": "^0.6.4",
-    "prettier": "^3.2.5",
+    "@types/node": "^20.11.30",
     "tsx": "^4.7.1",
     "typescript": "^5.4.3"
   }
