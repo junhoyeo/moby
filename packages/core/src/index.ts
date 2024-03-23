@@ -1,51 +1,27 @@
-import {
-  MemoryNetwork,
-  MemoryServer,
-} from '@moby/raft/dist/adapters/network/memory';
-import { LocalStateManager } from '@moby/raft/dist/adapters/state';
-import { RaftNode } from '@moby/raft/dist/core';
+import { MemoryNetwork } from '@moby/raft/dist/adapters/network/memory';
 import { ClientQueryResponse } from '@moby/raft/dist/dtos';
 import { CommandType, QueryType } from '@moby/raft/dist/interfaces';
 import { sleep } from '@moby/raft/dist/utils';
 
 import { Chain as Blockchain } from './chain';
-
-const NODES_NUMBER = 3;
-
-interface Account {
-  address: string;
-  balance: number;
-  stake: number;
-}
-
-const accounts: Account[] = [
-  { address: 'A1', balance: 1000, stake: 500 },
-  { address: 'A2', balance: 500, stake: 200 },
-  { address: 'A3', balance: 2000, stake: 1000 },
-];
+import { Node } from './node';
 
 const main = async () => {
   const blockchain = new Blockchain();
   const network = MemoryNetwork.getTestNetwork();
   // 1
-  const server1 = new MemoryServer();
-  network.addServer('NODE1', server1);
-  const state1 = new LocalStateManager('NODE1', 'testDB/store2');
-  const node1 = await RaftNode.create('NODE1', server1, state1, 'MEMORY', true);
+  const node1 = new Node('node1');
+  await node1.initialize(network);
   await sleep(300);
   // 2
-  const server2 = new MemoryServer();
-  network.addServer('NODE2', server2);
-  const state2 = new LocalStateManager('NODE2', 'testDB/store2');
-  const node2 = await RaftNode.create('NODE2', server2, state2, 'MEMORY');
-  server1.AddServer({ newServer: 'NODE2' });
+  const node2 = new Node('node2');
+  await node2.initialize(network);
+  node1.raftServer.AddServer({ newServer: node2.nodeId });
+  await sleep(300);
   // 3
-  const server3 = new MemoryServer();
-  network.addServer('NODE3', server3);
-  const state3 = new LocalStateManager('NODE3', 'testDB/store2');
-  const node3 = await RaftNode.create('NODE3', server3, state3, 'MEMORY');
-  server1.AddServer({ newServer: 'NODE3' });
-
+  const node3 = new Node('node3');
+  await node3.initialize(network);
+  node1.raftServer.AddServer({ newServer: node3.nodeId });
   await sleep(300);
 
   let block = blockchain.createGenesisBlock();
@@ -57,7 +33,7 @@ const main = async () => {
     }
 
     // create block
-    await server1.ClientRequest({
+    await node1.raftServer.ClientRequest({
       type: CommandType.STORE_SET,
       data: { key: block.height.toString(), value: JSON.stringify(block) },
     });
@@ -65,67 +41,57 @@ const main = async () => {
     await sleep(500);
 
     // query block
-    queryResponse = server1.ClientQuery({
+    queryResponse = node1.raftServer.ClientQuery({
       type: QueryType.GET,
       data: { key: block.height.toString() },
     });
     console.log({ queryResponse });
   }
 
-  node1.stopListeners();
-
-  // node1.stopListeners();
-  server1.RemoveServer({ oldServer: 'NODE1' });
-  network.removeServerFromNode('NODE1', { oldServer: 'NODE1' });
+  node1.stop();
   await sleep(1000);
 
   block = blockchain.addBlock([]);
-  let r = await server1.ClientRequest({
+  console.log('[*] New block', block);
+  let r = await node1.raftServer.ClientRequest({
     type: CommandType.STORE_SET,
     data: { key: block.height.toString(), value: JSON.stringify(block) },
   });
   console.log(r);
 
-  r = await server2.ClientRequest({
+  r = await node2.raftServer.ClientRequest({
     type: CommandType.STORE_SET,
     data: { key: block.height.toString(), value: JSON.stringify(block) },
   });
   console.log(r);
 
-  r = await server3.ClientRequest({
+  r = await node3.raftServer.ClientRequest({
     type: CommandType.STORE_SET,
     data: { key: block.height.toString(), value: JSON.stringify(block) },
   });
   console.log(r);
 
-  server1.RemoveServer({ oldServer: 'NODE1' });
-  network.removeServerFromNode('NODE1', { oldServer: 'NODE1' });
+  node1.stop();
   await sleep(500);
 
-  queryResponse = server1.ClientQuery({
+  queryResponse = node1.raftServer.ClientQuery({
     type: QueryType.GET,
     data: { key: block.height.toString() },
   });
   console.log({ queryResponse });
-  queryResponse = server2.ClientQuery({
+  queryResponse = node2.raftServer.ClientQuery({
     type: QueryType.GET,
     data: { key: block.height.toString() },
   });
   console.log({ queryResponse });
-  queryResponse = server3.ClientQuery({
-    type: QueryType.GET,
-    data: { key: block.height.toString() },
-  });
-  console.log({ queryResponse });
-
-  queryResponse = server1.ClientQuery({
+  queryResponse = node3.raftServer.ClientQuery({
     type: QueryType.GET,
     data: { key: block.height.toString() },
   });
   console.log({ queryResponse });
 
-  node2.stopListeners();
-  node3.stopListeners();
+  node2.stop();
+  node3.stop();
 
   process.exit(1);
 };
