@@ -1,9 +1,9 @@
-import "module-alias/register";
-import readline from "readline";
-import { CommandType, QueryType, RaftCluster } from "./interfaces";
-import { sleep } from "./utils";
-import { gRPCCluster } from "./clusters/grpc.cluster";
-import { MemoryCluster } from "./clusters/memory.cluster";
+import 'module-alias/register';
+import readline from 'readline';
+
+import { MemoryCluster } from './clusters/memory.cluster';
+import { CommandType, QueryType, RaftCluster } from './interfaces';
+import { sleep } from './utils';
 
 let cluster: RaftCluster;
 
@@ -13,26 +13,32 @@ let cluster: RaftCluster;
   console.log = () => {};
 
   const args = process.argv;
-  const protocol = args[2] ?? "memory";
+  const protocol = args[2] ?? 'memory';
   const nodesNumber = args[3] ?? 3;
 
-  if (protocol !== "memory" && protocol !== "rpc") {
+  // if (protocol !== 'memory' && protocol !== 'rpc') {
+  //   throw new Error(
+  //     `ONLY MEMORY & RPC Protocols are supported, you inserted ${protocol}`,
+  //   );
+  // }
+  if (protocol !== 'memory') {
     throw new Error(
-      `ONLY MEMORY & RPC Protocols are supported, you inserted ${protocol}`
+      `ONLY MEMORY Protocol is supported, you inserted ${protocol}`,
     );
   }
 
   if (Number(nodesNumber) < 3) {
     throw new Error(
-      `The minimum number of nodes is 3, you inserted ${nodesNumber}`
+      `The minimum number of nodes is 3, you inserted ${nodesNumber}`,
     );
   }
 
-  if (protocol == "memory") {
-    cluster = new MemoryCluster(Number(nodesNumber));
-  } else {
-    cluster = new gRPCCluster(Number(nodesNumber));
-  }
+  // if (protocol == 'memory') {
+  //   cluster = new MemoryCluster(Number(nodesNumber));
+  // } else {
+  //   cluster = new gRPCCluster(Number(nodesNumber));
+  // }
+  cluster = new MemoryCluster(Number(nodesNumber));
 
   await cluster.start();
   await sleep(1000);
@@ -43,13 +49,13 @@ let cluster: RaftCluster;
     output: process.stdout,
   });
   async function processCommand(command: string) {
-    const args = command.split(" ");
+    const args = command.split(' ');
     const commandType = args[0].toUpperCase();
 
     switch (commandType) {
-      case "SET":
+      case 'SET':
         if (args.length !== 3) {
-          console.info("Error: SET command requires key and value arguments.");
+          console.info('Error: SET command requires key and value arguments.');
           break;
         }
         const setResponse = await leader.clientRequest({
@@ -61,16 +67,16 @@ let cluster: RaftCluster;
         });
         if (setResponse.leaderHint) {
           leader = cluster.connections.filter(
-            (connection) => connection.peerId == setResponse.leaderHint
+            (connection) => connection.peerId == setResponse.leaderHint,
           )[0];
           processCommand(command);
         }
         rl.prompt();
         break;
 
-      case "DEL":
+      case 'DEL':
         if (args.length !== 2) {
-          console.info("Error: DELETE command requires a key argument.");
+          console.info('Error: DELETE command requires a key argument.');
           break;
         }
         const response = await leader.clientRequest({
@@ -81,16 +87,16 @@ let cluster: RaftCluster;
         });
         if (response.leaderHint) {
           leader = cluster.connections.filter(
-            (connection) => connection.peerId == response.leaderHint
+            (connection) => connection.peerId == response.leaderHint,
           )[0];
           processCommand(command);
         }
         rl.prompt();
         break;
 
-      case "GET":
+      case 'GET':
         if (args.length !== 2) {
-          console.info("Error: GET command requires a key argument.");
+          console.info('Error: GET command requires a key argument.');
           break;
         }
         const queryResponse = await leader.clientQuery({
@@ -101,20 +107,20 @@ let cluster: RaftCluster;
         });
         if (queryResponse.leaderHint) {
           leader = cluster.connections.filter(
-            (connection) => connection.peerId == queryResponse.leaderHint
+            (connection) => connection.peerId == queryResponse.leaderHint,
           )[0];
           processCommand(command);
         } else {
           console.info(
-            queryResponse.response == "" ? null : queryResponse.response
+            queryResponse.response == '' ? null : queryResponse.response,
           );
         }
         rl.prompt();
         break;
-      case "HDEL":
+      case 'HDEL':
         if (args.length !== 3) {
           console.info(
-            "Error: HDEL command requires a hash name and keys to be deleted: HDEL hash_name key1 [key2 key3 ...]"
+            'Error: HDEL command requires a hash name and keys to be deleted: HDEL hash_name key1 [key2 key3 ...]',
           );
           break;
         }
@@ -128,16 +134,16 @@ let cluster: RaftCluster;
         });
         if (hdelResponse.leaderHint) {
           leader = cluster.connections.filter(
-            (connection) => connection.peerId == hdelResponse.leaderHint
+            (connection) => connection.peerId == hdelResponse.leaderHint,
           )[0];
           processCommand(command);
         }
         rl.prompt();
         break;
-      case "HSET":
+      case 'HSET':
         if (args.length < 3) {
           console.info(
-            "Error: HSET command requires a hash name and values: HSET hash_name key1:value1 [key2:value2 ...]"
+            'Error: HSET command requires a hash name and values: HSET hash_name key1:value1 [key2:value2 ...]',
           );
           break;
         }
@@ -151,15 +157,17 @@ let cluster: RaftCluster;
         });
         if (hsetResponse.leaderHint) {
           leader = cluster.connections.filter(
-            (connection) => connection.peerId == hdelResponse.leaderHint
+            (connection) => connection.peerId == hdelResponse.leaderHint,
           )[0];
           processCommand(command);
         }
         rl.prompt();
         break;
-      case "HGET":
+      case 'HGET':
         if (args.length !== 3) {
-          console.info("Error: HGET command requires a hash name, and key arguments: HGET hash_name key");
+          console.info(
+            'Error: HGET command requires a hash name, and key arguments: HGET hash_name key',
+          );
           break;
         }
         const hgetResponse = await leader.clientQuery({
@@ -171,20 +179,20 @@ let cluster: RaftCluster;
         });
         if (hgetResponse.leaderHint) {
           leader = cluster.connections.filter(
-            (connection) => connection.peerId == hgetResponse.leaderHint
+            (connection) => connection.peerId == hgetResponse.leaderHint,
           )[0];
           processCommand(command);
         } else {
           console.info(
-            hgetResponse.response == "" ? null : hgetResponse.response
+            hgetResponse.response == '' ? null : hgetResponse.response,
           );
         }
         rl.prompt();
         break;
-      case "SDEL":
+      case 'SDEL':
         if (args.length !== 3) {
           console.info(
-            "Error: SDEL command requires a set name and values to be deleted: SDEL set_name value1 [value2 value3 ...]"
+            'Error: SDEL command requires a set name and values to be deleted: SDEL set_name value1 [value2 value3 ...]',
           );
           break;
         }
@@ -198,16 +206,16 @@ let cluster: RaftCluster;
         });
         if (sdelResponse.leaderHint) {
           leader = cluster.connections.filter(
-            (connection) => connection.peerId == sdelResponse.leaderHint
+            (connection) => connection.peerId == sdelResponse.leaderHint,
           )[0];
           processCommand(command);
         }
         rl.prompt();
         break;
-      case "SSET":
+      case 'SSET':
         if (args.length < 3) {
           console.info(
-            "Error: SSET command requires a set name and values: SSET set_name value1 [value2 ...]"
+            'Error: SSET command requires a set name and values: SSET set_name value1 [value2 ...]',
           );
           break;
         }
@@ -221,16 +229,16 @@ let cluster: RaftCluster;
         });
         if (ssetResponse.leaderHint) {
           leader = cluster.connections.filter(
-            (connection) => connection.peerId == ssetResponse.leaderHint
+            (connection) => connection.peerId == ssetResponse.leaderHint,
           )[0];
           processCommand(command);
         }
         rl.prompt();
         break;
-      case "SHAS":
+      case 'SHAS':
         if (args.length !== 3) {
           console.info(
-            "Error: SHAS command requires a set name, and value argument: SHAS set_name value"
+            'Error: SHAS command requires a set name, and value argument: SHAS set_name value',
           );
           break;
         }
@@ -243,17 +251,17 @@ let cluster: RaftCluster;
         });
         if (shasResponse.leaderHint) {
           leader = cluster.connections.filter(
-            (connection) => connection.peerId == shasResponse.leaderHint
+            (connection) => connection.peerId == shasResponse.leaderHint,
           )[0];
           processCommand(command);
         } else {
           console.info(
-            shasResponse.response == "" ? false : shasResponse.response
+            shasResponse.response == '' ? false : shasResponse.response,
           );
         }
         rl.prompt();
         break;
-      case "EXIT":
+      case 'EXIT':
         rl.close();
         process.exit(0);
 
@@ -263,13 +271,13 @@ let cluster: RaftCluster;
     }
   }
 
-  rl.on("line", async (input) => {
+  rl.on('line', async (input) => {
     processCommand(input);
   });
 
-  console.info("TF-RAFT: Distributed KV Store for educational fun!");
+  console.info('TF-RAFT: Distributed KV Store for educational fun!');
   console.info(
-    "Enter your commands (e.g., SET key value, DEL key, GET key). Type EXIT to end."
+    'Enter your commands (e.g., SET key value, DEL key, GET key). Type EXIT to end.',
   );
   rl.prompt();
 })();

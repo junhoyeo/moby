@@ -1,16 +1,4 @@
 import {
-  Command,
-  CommandType,
-  LogEntry,
-  PeerConnection,
-  Query,
-  QueryType,
-  Server,
-  StateManager,
-} from "@/interfaces";
-import { getRandomTimeout } from "@/utils";
-import { STATES } from "./constants";
-import {
   AddServerRequest,
   AppendEntryRequest,
   AppendEntryResponse,
@@ -21,11 +9,25 @@ import {
   RemoveServerRequest,
   RequestVoteRequest,
   RequestVoteResponse,
-} from "@/dtos";
-import { membershipAddCMD, membershipRemoveCMD, noOpCMD } from "./commands";
-import { Store } from "@/store/interfaces";
-import { MemoryStore } from "@/store/memory.store";
-import { PeerFactory } from "@/factories";
+} from '@/dtos';
+import { PeerFactory } from '@/factories';
+import {
+  Command,
+  CommandType,
+  LogEntry,
+  PeerConnection,
+  Query,
+  QueryType,
+  Server,
+  StateManager,
+} from '@/interfaces';
+import { Store } from '@/store/interfaces';
+import { MemoryStore } from '@/store/memory.store';
+import { getRandomTimeout } from '@/utils';
+
+import { membershipAddCMD, membershipRemoveCMD, noOpCMD } from './commands';
+import { STATES } from './constants';
+
 export class RaftNode {
   private peers: PeerConnection[] = [];
   private state!: STATES;
@@ -38,9 +40,10 @@ export class RaftNode {
     private readonly id: string,
     private readonly server: Server,
     private readonly stateManager: StateManager,
-    private readonly protocol: "RPC" | "MEMORY",
+    // private readonly protocol: "RPC" | "MEMORY",
+    private readonly protocol: 'MEMORY',
     private readonly leader: boolean,
-    private readonly store: Store
+    private readonly store: Store,
   ) {
     this.id = id;
     this.server = server;
@@ -55,8 +58,9 @@ export class RaftNode {
     id: string,
     server: Server,
     stateManager: StateManager,
-    protocol: "RPC" | "MEMORY",
-    leader = false
+    // protocol: 'RPC' | 'MEMORY',
+    protocol: 'MEMORY',
+    leader = false,
   ): Promise<RaftNode> {
     await stateManager.start();
     // start the node with current configuration so it can be caught up by future leaders.
@@ -74,7 +78,7 @@ export class RaftNode {
       stateManager,
       protocol,
       leader,
-      new MemoryStore()
+      new MemoryStore(),
     );
   }
 
@@ -84,16 +88,22 @@ export class RaftNode {
   private resetElectionTimeout() {
     clearTimeout(this.electionTimeout);
     console.log(`${this.nodeId} timeout has been reset`);
-    this.electionTimeout = setTimeout(async () => {
-      console.log(`${this.nodeId} election timeout finished`);
-      await this.becomeCandidate();
-    }, getRandomTimeout(150, 300));
+    this.electionTimeout = setTimeout(
+      async () => {
+        console.log(`${this.nodeId} election timeout finished`);
+        await this.becomeCandidate();
+      },
+      getRandomTimeout(150, 300),
+    );
   }
 
   private async leaderHeartbeats() {
-    this.heartbeatInterval = setInterval(async () => {
-      await this.sendHeartbeats();
-    }, getRandomTimeout(100, 100));
+    this.heartbeatInterval = setInterval(
+      async () => {
+        await this.sendHeartbeats();
+      },
+      getRandomTimeout(100, 100),
+    );
   }
 
   /**********************
@@ -175,7 +185,7 @@ export class RaftNode {
    * @returns
    */
   private voteReceived(
-    electionTerm: number
+    electionTerm: number,
   ): (voterResponse: RequestVoteResponse) => void {
     return async (voterResponse: RequestVoteResponse): Promise<void> => {
       let currentTerm = await this.stateManager.getCurrentTerm();
@@ -212,8 +222,8 @@ export class RaftNode {
   public async sendHeartbeats() {
     console.log(
       `${this.nodeId} sending heartbeat ${JSON.stringify(
-        this.stateManager.getNextIndexes()
-      )}`
+        this.stateManager.getNextIndexes(),
+      )}`,
     );
     let currentTerm = await this.stateManager.getCurrentTerm();
     let leaderCommit = this.stateManager.getCommitIndex();
@@ -247,7 +257,7 @@ export class RaftNode {
 
       if (entries.length) {
         console.log(
-          `${this.nodeId} is about to send log of index ${nextIndex} to node ${peer.peerId}`
+          `${this.nodeId} is about to send log of index ${nextIndex} to node ${peer.peerId}`,
         );
         console.log(this.stateManager.getNextIndexes());
       }
@@ -256,8 +266,8 @@ export class RaftNode {
         this.appendEntryResponseReceived(
           request.entries,
           peer.peerId,
-          currentTerm
-        ).bind(this)
+          currentTerm,
+        ).bind(this),
       );
     }
 
@@ -276,7 +286,7 @@ export class RaftNode {
           let matched = 1; // leader
           for (let i = 0; i < this.peers.length; i++) {
             const matchedIndex = this.stateManager.getMatchIndex(
-              this.peers[i].peerId
+              this.peers[i].peerId,
             );
             if (matchedIndex >= i) {
               matched++;
@@ -294,7 +304,7 @@ export class RaftNode {
   private appendEntryResponseReceived(
     entries: LogEntry[],
     peerId: string,
-    sentAtTerm: number
+    sentAtTerm: number,
   ): (receiverResponse: AppendEntryResponse) => void {
     return async (receiverResponse: AppendEntryResponse) => {
       let currentTerm = await this.stateManager.getCurrentTerm();
@@ -315,8 +325,8 @@ export class RaftNode {
           this.stateManager.setNextIndex(peerId, nextIndex);
           console.log(
             `next of peer ${peerId} was ${currentNext} and is now ${this.stateManager.getNextIndex(
-              peerId
-            )}`
+              peerId,
+            )}`,
           );
           this.stateManager.setMatchIndex(peerId, nextIndex - 1);
         }
@@ -324,7 +334,7 @@ export class RaftNode {
         // Ch.3 P21 - Consistency checks failed.
         this.stateManager.setNextIndex(
           peerId,
-          this.stateManager.getNextIndex(peerId) - 1
+          this.stateManager.getNextIndex(peerId) - 1,
         );
       }
     };
@@ -335,9 +345,9 @@ export class RaftNode {
   **********************/
 
   public async addServerHandler(
-    request: AddServerRequest
+    request: AddServerRequest,
   ): Promise<MembershipChangeResponse> {
-    const leader = this.stateManager.getLeaderId() ?? "";
+    const leader = this.stateManager.getLeaderId() ?? '';
     const response = {
       status: MEMBERSHIP_CHANGES_RESPONSES.OK,
       leaderHint: leader,
@@ -359,9 +369,9 @@ export class RaftNode {
   }
 
   public async removeServerHandler(
-    request: RemoveServerRequest
+    request: RemoveServerRequest,
   ): Promise<MembershipChangeResponse> {
-    const leader = this.stateManager.getLeaderId() ?? "";
+    const leader = this.stateManager.getLeaderId() ?? '';
     const response = {
       status: MEMBERSHIP_CHANGES_RESPONSES.OK,
       leaderHint: leader,
@@ -386,7 +396,7 @@ export class RaftNode {
   private addPeer(serverIdentifier: string) {
     let peer!: PeerConnection;
     const peerIndex = this.peers.findIndex(
-      (peer) => peer.peerId == serverIdentifier
+      (peer) => peer.peerId == serverIdentifier,
     );
     if (peerIndex > -1) {
       this.peers.splice(peerIndex, 1);
@@ -401,7 +411,7 @@ export class RaftNode {
 
   private removePeer(serverIdentifier: string) {
     const peerIndex = this.peers.findIndex(
-      (peer) => peer.peerId == serverIdentifier
+      (peer) => peer.peerId == serverIdentifier,
     );
     if (peerIndex > -1) {
       this.peers.splice(peerIndex, 1);
@@ -410,11 +420,11 @@ export class RaftNode {
 
   public applyMembershipAdd(serverIdentifier: string) {
     console.log(
-      `${this.nodeId} is applying peer addition - adding: ${serverIdentifier}`
+      `${this.nodeId} is applying peer addition - adding: ${serverIdentifier}`,
     );
     let peer!: PeerConnection;
     const peerIndex = this.peers.findIndex(
-      (peer) => peer.peerId == serverIdentifier
+      (peer) => peer.peerId == serverIdentifier,
     );
     if (peerIndex > -1) {
       this.peers.splice(peerIndex, 1);
@@ -426,7 +436,7 @@ export class RaftNode {
 
   public applyMembershipRemove(serverIdentifier: string) {
     const peerIndex = this.peers.findIndex(
-      (peer) => peer.peerId == serverIdentifier
+      (peer) => peer.peerId == serverIdentifier,
     );
     if (peerIndex > -1) {
       this.peers.splice(peerIndex, 1);
@@ -437,7 +447,7 @@ export class RaftNode {
   Leader Election and Log Replication
   **********************/
   public async requestVoteHandler(
-    requester: RequestVoteRequest
+    requester: RequestVoteRequest,
   ): Promise<RequestVoteResponse> {
     this.resetElectionTimeout();
     let currentTerm = await this.stateManager.getCurrentTerm();
@@ -483,13 +493,13 @@ export class RaftNode {
   }
 
   public async appendEntryHandler(
-    request: AppendEntryRequest
+    request: AppendEntryRequest,
   ): Promise<AppendEntryResponse> {
     this.resetElectionTimeout();
     let currentTerm = await this.stateManager.getCurrentTerm();
     let commitIndex = this.stateManager.getCommitIndex();
     let prevLogEntry = await this.stateManager.getLogAtIndex(
-      request.prevLogIndex
+      request.prevLogIndex,
     );
     const response = {
       success: true,
@@ -519,7 +529,7 @@ export class RaftNode {
 
     if (prevLogEntry.term !== request.prevLogTerm) {
       await this.stateManager.deleteFromIndexMovingForward(
-        request.prevLogIndex
+        request.prevLogIndex,
       );
     }
 
@@ -530,7 +540,7 @@ export class RaftNode {
       // leaderCommit if we already in sync, or lastIndex if the follower is behind the leader.
       // and there're entires that hasn't been sent yet.
       this.stateManager.setCommitIndex(
-        Math.min(request.leaderCommit, lastIndex)
+        Math.min(request.leaderCommit, lastIndex),
       );
     }
 
@@ -560,7 +570,9 @@ export class RaftNode {
   /**********************
    Client Interaction
    **********************/
-  public async handleClientRequest(command: Command<any>): Promise<ClientRequestResponse> {
+  public async handleClientRequest(
+    command: Command<any>,
+  ): Promise<ClientRequestResponse> {
     // as an improvement here: we should reply with status and response only after the log is applied.
     const leaderId = this.stateManager.getLeaderId() ?? '';
     if (this.nodeState == STATES.LEADER) {
@@ -576,7 +588,7 @@ export class RaftNode {
     const leaderId = this.stateManager.getLeaderId() ?? '';
     if (this.nodeState == STATES.LEADER) {
       let value: string | null = '';
-      switch(query.type) {
+      switch (query.type) {
         case QueryType.GET:
           value = this.store.GET(query.data.key);
           break;
@@ -629,45 +641,45 @@ export class RaftNode {
   private logApplier(logEntry: LogEntry) {
     switch (logEntry.command.type) {
       case CommandType.MEMBERSHIP_ADD:
-        console.log("MEMBERSHIP_ADD command applier");
+        console.log('MEMBERSHIP_ADD command applier');
         if (logEntry.command.data !== this.nodeId) {
           this.applyMembershipAdd(logEntry.command.data);
         }
         break;
       case CommandType.MEMBERSHIP_REMOVE:
-        console.log("MEMBERSHIP_REMOVE command applier");
+        console.log('MEMBERSHIP_REMOVE command applier');
         this.applyMembershipRemove(logEntry.command.data);
         break;
       case CommandType.STORE_SET:
-        console.log("STORE_SET command applier");
+        console.log('STORE_SET command applier');
         this.store.SET(logEntry.command.data.key, logEntry.command.data.value);
         break;
       case CommandType.STORE_DEL:
-        console.log("STORE_DEL command applier");
+        console.log('STORE_DEL command applier');
         this.store.DEL(logEntry.command.data.key);
         break;
       case CommandType.STORE_HSET:
-        console.log("STORE_HSET command applier");
+        console.log('STORE_HSET command applier');
         const hsetPairs = logEntry.command.data.pairs;
         this.store.HSET(logEntry.command.data.hashKey, hsetPairs);
         break;
       case CommandType.STORE_HDEL:
-        console.log("STORE_HDEL command applier");
+        console.log('STORE_HDEL command applier');
         const hdelKeys = logEntry.command.data.keys;
         this.store.HDEL(logEntry.command.data.hashKey, hdelKeys);
         break;
       case CommandType.STORE_SSET:
-        console.log("STORE_SSET command applier");
+        console.log('STORE_SSET command applier');
         const setValues = logEntry.command.data.values;
         this.store.SSET(logEntry.command.data.setKey, setValues);
         break;
       case CommandType.STORE_SDEL:
-        console.log("STORE_SDEL command applier");
+        console.log('STORE_SDEL command applier');
         const sdelValues = logEntry.command.data.values;
         this.store.SDEL(logEntry.command.data.setKey, sdelValues);
         break;
       default:
-        console.log("UNHANDLED COMMAND", logEntry.command);
+        console.log('UNHANDLED COMMAND', logEntry.command);
     }
   }
 }
