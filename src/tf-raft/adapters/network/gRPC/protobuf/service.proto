@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+service RaftNode {
+      rpc requestVote(RequestVoteRequest) returns (RequestVoteResponse);
+      rpc appendEntries(AppendEntriesRequest) returns (AppendEntriesResponse);
+      rpc addServer(AddServerRequest) returns (MembershipChangeResponse);
+      rpc removeServer(RemoveServerRequest) returns (MembershipChangeResponse);
+      rpc clientRequest(ClientRequestRequest) returns (NoResponse);
+      rpc clientQuery(ClientQueryRequest) returns (ClientQueryResponse);
+}
+
+message RequestVoteRequest {
+    int32 term = 1;
+    string candidate_id = 2;
+    int32 last_log_index = 3;
+    int32 last_log_term = 4;
+}
+
+message RequestVoteResponse {
+    int32 term = 1;
+    bool vote_granted = 2;
+}
+
+message AppendEntriesRequest {
+    int32 term = 1;
+    string leader_id = 2;
+    int32 prev_log_index = 3;
+    int32 prev_log_term = 4;
+    string entries = 5;
+    int32 leader_commit = 6;
+}
+
+message AppendEntriesResponse {
+    int32 term = 1;
+    bool success = 2;
+}
+
+message AddServerRequest {
+    string new_server = 1;
+}
+
+message RemoveServerRequest {
+    string old_server = 1;
+}
+
+message MembershipChangeResponse {
+    MEMBERSHIP_CHANGES_RESPONSES status = 1;
+    string leader_hint = 2;
+}
+
+message ClientRequestRequest {
+    CommandType type = 1;
+    string data = 2;
+}
+
+message ClientQueryRequest {
+    string key = 1;
+}
+
+message ClientQueryResponse {
+    bool status = 1;
+    string leader_hint = 2;
+    string response = 3;
+}
+
+enum MEMBERSHIP_CHANGES_RESPONSES{
+    OK = 0;
+    NOT_LEADER = 1;
+}
+
+enum CommandType {
+    NOOP = 0;
+    STORE_SET = 1;
+    STORE_DEL = 2;
+  }
+
+message NoResponse { }

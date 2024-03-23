@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2019",
+    "module": "commonjs",
+    "strict": true,
+    "noImplicitAny": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/tf-raft/*"]
+    },
+    "rootDirs": ["."],
+    "esModuleInterop": true,
+    "skipLibCheck": false,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "outDir": "./dist"
+  }
+}
