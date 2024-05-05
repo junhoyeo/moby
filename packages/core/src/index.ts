@@ -1,4 +1,5 @@
-import { ABCIServer } from '@moby/abci';
+import { createABCIServer } from '@moby/abci';
 
-var appServer = new ABCIServer();
-appServer.server.listen(26658);
+// console.log(abci);
+var appServer = createABCIServer();
+appServer.listen(26658);

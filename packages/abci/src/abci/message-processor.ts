@@ -17,7 +17,8 @@ import {
 	query,
 	setOption,
 } from './processors';
-import { deserialize, serialize } from './serialization/protobuf';
+
+// import { deserialize, serialize } from './serialization/protobuf';
 
 type RequestProcessor = (req: Request) => Response;
 const processors: Map<string, RequestProcessor> = new Map<
@@ -41,24 +42,25 @@ const processors: Map<string, RequestProcessor> = new Map<
 	[RequestType.setOption, setOption],
 ]);
 
-export function processMessage(proto: Buffer): Buffer {
-	const req: Request[] = deserialize(proto);
+export function processMessage(req: Request): Response | undefined {
+	// const req: Request[] = deserialize(proto);
 	console.log('\n');
 	console.log('process messages', req);
-	const res: Response[] = [];
-	for (const r of req) {
-		if (!!r.value.case && processors.has(r.value.case)) {
-			console.log(`Processing message ${r.value.case}`, r.value.value);
-			const processor = processors.get(r.value.case);
-			if (processor) {
-				res.push(processor(r));
-			}
+	const r = req;
+	let res: Response | undefined;
+	// for (const r of req) {
+	if (!!r.value.case && processors.has(r.value.case)) {
+		console.log(`Processing message ${r.value.case}`, r.value.value);
+		const processor = processors.get(r.value.case);
+		if (processor) {
+			res = processor(r);
 		}
 	}
+	// }
 	console.log('\n');
 	console.log('Return responses', res);
-	for (let r of res) {
-		console.log(`Response for ${r.value.case}`, r.value.value);
-	}
-	return serialize(res);
+	// for (let r of res) {
+	// 	console.log(`Response for ${r.value.case}`, r.value.value);
+	// }
+	return res;
 }

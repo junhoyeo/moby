@@ -14,6 +14,7 @@
 		"@bufbuild/buf": "^1.31.0",
 		"@bufbuild/protobuf": "^1.9.0",
 		"@bufbuild/protoc-gen-es": "^1.9.0",
+		"bl": "^6.0.12",
 		"varint": "^6.0.0"
 	},
 	"devDependencies": {
