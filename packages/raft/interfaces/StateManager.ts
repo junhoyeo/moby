@@ -1,8 +1,8 @@
-import { LogEntry } from "./LogEntry";
+import { LogEntry } from './LogEntry';
 
 // Ch. 3.2 p.13
 export interface StateManager {
-  start(): Promise<void>
+  start(): Promise<void>;
   // Persistent:
   getCurrentTerm(): Promise<number>;
   setCurrentTerm(term: number): Promise<void>;

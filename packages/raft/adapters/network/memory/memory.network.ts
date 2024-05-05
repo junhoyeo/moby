@@ -8,9 +8,10 @@ import {
   RemoveServerRequest,
   RequestVoteRequest,
   RequestVoteResponse,
-} from "@/dtos";
-import { MemoryServer } from "./memory.server";
-import { Command, Query } from "@/interfaces";
+} from '@/dtos';
+import { Command, Query } from '@/interfaces';
+
+import { MemoryServer } from './memory.server';
 
 export class MemoryNetwork {
   public nodes: Record<string, MemoryServer> = {};
@@ -32,7 +33,7 @@ export class MemoryNetwork {
 
   public async requestVoteFromNode(
     nodeId: string,
-    request: RequestVoteRequest
+    request: RequestVoteRequest,
   ): Promise<RequestVoteResponse> {
     const response = await this.nodes[nodeId].RequestVote(request);
     return response;
@@ -40,7 +41,7 @@ export class MemoryNetwork {
 
   public async appendEntriesToNode(
     nodeId: string,
-    request: AppendEntryRequest
+    request: AppendEntryRequest,
   ): Promise<AppendEntryResponse> {
     const response = await this.nodes[nodeId].AppendEntries(request);
     return response;
@@ -48,7 +49,7 @@ export class MemoryNetwork {
 
   public async addServerToNode(
     nodeId: string,
-    request: AddServerRequest
+    request: AddServerRequest,
   ): Promise<MembershipChangeResponse> {
     const response = await this.nodes[nodeId].AddServer(request);
     return response;
@@ -56,23 +57,20 @@ export class MemoryNetwork {
 
   public async removeServerFromNode(
     nodeId: string,
-    request: RemoveServerRequest
+    request: RemoveServerRequest,
   ): Promise<MembershipChangeResponse> {
     const response = await this.nodes[nodeId].RemoveServer(request);
     return response;
   }
 
-  public clientQueryToNode(
-    nodeId: string,
-    query: Query
-  ): ClientQueryResponse {
+  public clientQueryToNode(nodeId: string, query: Query): ClientQueryResponse {
     const response = this.nodes[nodeId].ClientQuery(query);
     return response;
   }
 
   public async clientRequestToNode(
     nodeId: string,
-    request: Command<any>
+    request: Command<any>,
   ): Promise<ClientRequestResponse> {
     const response = await this.nodes[nodeId].ClientRequest(request);
     return response;

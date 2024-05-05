@@ -1,1 +1,1 @@
-export * from "./Store.interface";
+export * from './Store.interface';

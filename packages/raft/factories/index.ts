@@ -1,1 +1,1 @@
-export * from "./peer.factory";
+export * from './peer.factory';

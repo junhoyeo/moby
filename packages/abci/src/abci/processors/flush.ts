@@ -1,12 +1,12 @@
-import { RequestType } from "../enums";
-import { ResponseFlush } from "../../proto/ts/tendermint/abci/types_pb";
-import { Request, Response } from "../../proto/ts/tendermint/abci/types_pb";
+import { ResponseFlush } from '../../proto/ts/tendermint/abci/types_pb';
+import { Request, Response } from '../../proto/ts/tendermint/abci/types_pb';
+import { RequestType } from '../enums';
 
 export function flush(req: Request): Response {
 	return new Response({
 		value: {
 			case: RequestType.flush,
-			value: new ResponseFlush()
-		}
+			value: new ResponseFlush(),
+		},
 	});
 }

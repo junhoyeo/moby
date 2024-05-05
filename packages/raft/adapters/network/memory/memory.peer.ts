@@ -1,16 +1,17 @@
 import {
-  RequestVoteRequest,
-  RequestVoteResponse,
+  AddServerRequest,
   AppendEntryRequest,
   AppendEntryResponse,
-  AddServerRequest,
-  MembershipChangeResponse,
-  RemoveServerRequest,
   ClientQueryResponse,
   ClientRequestResponse,
-} from "@/dtos";
-import { Command, PeerConnection, Query } from "@/interfaces";
-import { MemoryNetwork } from "./memory.network";
+  MembershipChangeResponse,
+  RemoveServerRequest,
+  RequestVoteRequest,
+  RequestVoteResponse,
+} from '@/dtos';
+import { Command, PeerConnection, Query } from '@/interfaces';
+
+import { MemoryNetwork } from './memory.network';
 
 export class MemoryPeer implements PeerConnection {
   private network = MemoryNetwork.getNetwork();
@@ -20,40 +21,40 @@ export class MemoryPeer implements PeerConnection {
 
   public async requestVote(
     request: RequestVoteRequest,
-    callback: (response: RequestVoteResponse) => void
+    callback: (response: RequestVoteResponse) => void,
   ): Promise<void> {
     const response = await this.network.requestVoteFromNode(
       this.peerId,
-      request
+      request,
     );
     callback(response);
   }
 
   public async appendEntries(
     request: AppendEntryRequest,
-    callback: (response: AppendEntryResponse) => void
+    callback: (response: AppendEntryResponse) => void,
   ): Promise<void> {
     const response = await this.network.appendEntriesToNode(
       this.peerId,
-      request
+      request,
     );
     callback(response);
   }
 
   // used by clients / admins
   public async addServer(
-    request: AddServerRequest
+    request: AddServerRequest,
   ): Promise<MembershipChangeResponse> {
     const response = await this.network.addServerToNode(this.peerId, request);
     return response;
   }
 
   public async removeServer(
-    request: RemoveServerRequest
+    request: RemoveServerRequest,
   ): Promise<MembershipChangeResponse> {
     const response = await this.network.removeServerFromNode(
       this.peerId,
-      request
+      request,
     );
     return response;
   }
@@ -63,11 +64,11 @@ export class MemoryPeer implements PeerConnection {
     return response;
   }
   public async clientRequest(
-    request: Command<any>
+    request: Command<any>,
   ): Promise<ClientRequestResponse> {
     const response = await this.network.clientRequestToNode(
       this.peerId,
-      request
+      request,
     );
     return response;
   }

@@ -1,4 +1,4 @@
-import { RaftNode } from "@/core";
+import { RaftNode } from '@/core';
 
 export interface Server {
   listen(node: RaftNode): void;

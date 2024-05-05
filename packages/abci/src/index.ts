@@ -1,5 +1,6 @@
 // Server
 import { createServer } from 'net';
+
 import { processMessage } from './abci/message-processor';
 
 const PORT = 26658;
@@ -11,26 +12,25 @@ const server = createServer((socket) => {
 
 	socket.on('connect', () => {
 		console.log(`Socket Connected ${id}`);
-	})
+	});
 
 	socket.on('close', () => {
 		console.log(`Socket Close ${id}`);
-	})
+	});
 
 	socket.on('ready', () => {
 		console.log(`Socket Ready ${id}`);
-	})
+	});
 
 	socket.on('end', () => {
 		console.log(`Socket End ${id}`);
-	})
+	});
 
 	socket.on('data', (data) => {
 		console.log(`Data received on channel - ${id}`);
 		console.log('socket.bytesRead', socket.bytesRead);
 		socket.write(processMessage(data));
 	});
-
 });
 
 server.on('error', (err) => {

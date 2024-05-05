@@ -1,1 +1,1 @@
-export * from "./local.state";
+export * from './local.state';

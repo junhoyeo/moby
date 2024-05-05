@@ -1,4 +1,4 @@
-import { LogEntry } from "@/interfaces";
+import { LogEntry } from '@/interfaces';
 
 export interface AppendEntryRequest {
   term: number;

@@ -1,6 +1,6 @@
-import { RequestType } from "../enums";
-import { ResponseInfo } from "../../proto/ts/tendermint/abci/types_pb";
-import { Request, Response } from "../../proto/ts/tendermint/abci/types_pb";
+import { ResponseInfo } from '../../proto/ts/tendermint/abci/types_pb';
+import { Request, Response } from '../../proto/ts/tendermint/abci/types_pb';
+import { RequestType } from '../enums';
 
 export function info(req: Request): Response {
 	return new Response({
@@ -10,7 +10,7 @@ export function info(req: Request): Response {
 				version: '1.0.0',
 				lastBlockHeight: 0n,
 				lastBlockAppHash: Buffer.from(''),
-			})
-		}
-	})
+			}),
+		},
+	});
 }

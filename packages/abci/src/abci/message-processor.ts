@@ -1,6 +1,5 @@
-import { RequestType } from './enums';
-import { deserialize, serialize } from './serialization/protobuf';
 import { Request, Response } from '../proto/ts/tendermint/abci/types_pb';
+import { RequestType } from './enums';
 import {
 	applySnapshotChunk,
 	beginBlock,
@@ -19,9 +18,13 @@ import {
 	processProposal,
 	query,
 } from './processors';
+import { deserialize, serialize } from './serialization/protobuf';
 
 type RequestProcessor = (req: Request) => Response;
-const processors: Map<string, RequestProcessor> = new Map<string, RequestProcessor>([
+const processors: Map<string, RequestProcessor> = new Map<
+	string,
+	RequestProcessor
+>([
 	[RequestType.applySnapshotChunk, applySnapshotChunk],
 	[RequestType.beginBlock, beginBlock],
 	[RequestType.checkTx, checkTx],
@@ -42,8 +45,8 @@ const processors: Map<string, RequestProcessor> = new Map<string, RequestProcess
 
 export function processMessage(proto: Buffer): Buffer {
 	const req: Request[] = deserialize(proto);
-	console.log("\n");
-	console.log("process messages", req);
+	console.log('\n');
+	console.log('process messages', req);
 	const res: Response[] = [];
 	for (const r of req) {
 		if (processors.has(r.value.case)) {
@@ -52,7 +55,7 @@ export function processMessage(proto: Buffer): Buffer {
 			res.push(processor(r));
 		}
 	}
-	console.log("\n");
+	console.log('\n');
 	console.log('Return responses', res);
 	for (let r of res) {
 		console.log(`Response for ${r.value.case}`, r.value.value);

@@ -1,12 +1,13 @@
-import { LogEntry, StateManager } from "@/interfaces";
-import { JsonDB, Config } from "node-json-db";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { Config, JsonDB } from 'node-json-db';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+
+import { LogEntry, StateManager } from '@/interfaces';
 
 const persistentKeys = {
-  CURRENT_TERM: "db.currentTerm",
-  LOG: "db.log",
-  VOTED_FOR: "db.votedFor",
+  CURRENT_TERM: 'db.currentTerm',
+  LOG: 'db.log',
+  VOTED_FOR: 'db.votedFor',
 };
 
 // it uses jsonDB. for persistent data, and memory for volatile data.
@@ -25,7 +26,10 @@ export class LocalStateManager implements StateManager {
     matchIndex: {},
     leaderId: null,
   };
-  constructor(private nodeId: string, private path = "db") {
+  constructor(
+    private nodeId: string,
+    private path = 'db',
+  ) {
     this.nodeId = nodeId;
     this.path = path;
   }
@@ -41,7 +45,7 @@ export class LocalStateManager implements StateManager {
       }
     } catch (error) {}
     this.db = new JsonDB(
-      new Config(`${directory}/` + this.nodeId, true, false, ".")
+      new Config(`${directory}/` + this.nodeId, true, false, '.'),
     );
     await this.db.push(persistentKeys.CURRENT_TERM, -1);
     await this.db.push(persistentKeys.LOG, []);
@@ -58,7 +62,7 @@ export class LocalStateManager implements StateManager {
   public async IncrementCurrentTerm(): Promise<void> {
     return await this.db.push(
       persistentKeys.CURRENT_TERM,
-      (await this.db.getData(persistentKeys.CURRENT_TERM)) + 1
+      (await this.db.getData(persistentKeys.CURRENT_TERM)) + 1,
     );
   }
   public async getVotedFor(): Promise<string> {
@@ -76,13 +80,13 @@ export class LocalStateManager implements StateManager {
     const log = await this.db.getData(persistentKeys.LOG);
     const logEntry = log[index];
     if (!logEntry && index == -1) {
-      return { term: -1, command: "" };
+      return { term: -1, command: '' };
     }
     return log[index];
   }
   public async deleteFromIndexMovingForward(index: number): Promise<void> {
     console.log(
-      `${this.nodeId} is deleting logs from index ${index} moving forward`
+      `${this.nodeId} is deleting logs from index ${index} moving forward`,
     );
     const log: Array<LogEntry> = await this.db.getData(persistentKeys.LOG);
     log.splice(index);
@@ -94,7 +98,7 @@ export class LocalStateManager implements StateManager {
     console.log(`${this.nodeId} accessing last log entry`, log[log.length - 1]);
     const lastLog = log[log.length - 1];
     if (!lastLog) {
-      return { term: -1, command: "" };
+      return { term: -1, command: '' };
     }
     return log[log.length - 1];
   }
@@ -145,7 +149,7 @@ export class LocalStateManager implements StateManager {
     return this.volatile.nextIndex;
   }
   public setNextIndex(nodeId: string, value: number): void {
-    console.log(`${this.nodeId} setting next of node ${nodeId} to ${value}`)
+    console.log(`${this.nodeId} setting next of node ${nodeId} to ${value}`);
     this.volatile.nextIndex[nodeId] = value;
   }
   public getMatchIndex(nodeId: string): number {

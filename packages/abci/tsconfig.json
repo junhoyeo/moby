@@ -9,11 +9,7 @@
 		"experimentalDecorators": true,
 		"moduleResolution": "node",
 		"module": "commonjs",
-		"lib": [
-			"ESNext"
-		]
+		"lib": ["ESNext"]
 	},
-	"include": [
-		"src",
-	]
+	"include": ["src"]
 }

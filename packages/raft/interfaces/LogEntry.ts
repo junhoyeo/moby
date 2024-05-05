@@ -1,4 +1,4 @@
 export interface LogEntry {
-    term: number,
-    command: any,
+  term: number;
+  command: any;
 }

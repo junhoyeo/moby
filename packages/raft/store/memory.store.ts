@@ -1,4 +1,4 @@
-import { Store } from "./interfaces";
+import { Store } from './interfaces';
 
 export class MemoryStore implements Store {
   private store = new Map();
@@ -22,8 +22,8 @@ export class MemoryStore implements Store {
       this.store.set(hashKey, hash);
     }
 
-    for ( let i = 0;i < pairs.length; i++) {
-      const split = pairs[i].split(":");
+    for (let i = 0; i < pairs.length; i++) {
+      const split = pairs[i].split(':');
       const key = split[0];
       const value = split[1];
       hash.set(key, value);
@@ -38,11 +38,11 @@ export class MemoryStore implements Store {
     }
     return hash.get(key);
   }
-  
+
   HDEL(hashKey: string, keys: [string]): void {
     const hash = this.store.get(hashKey);
     if (hash) {
-      for ( let i = 0; i < keys.length; i++) {
+      for (let i = 0; i < keys.length; i++) {
         hash.delete(keys[i]);
       }
     }
@@ -55,7 +55,7 @@ export class MemoryStore implements Store {
       this.store.set(setKey, set);
     }
 
-    for ( let i = 0;i < values.length; i++) {
+    for (let i = 0; i < values.length; i++) {
       set.add(values[i]);
     }
     this.store.set(setKey, set);
@@ -68,11 +68,11 @@ export class MemoryStore implements Store {
     }
     return set.has(value);
   }
-  
+
   SDEL(setKey: string, values: [string]): void {
     const set = this.store.get(setKey);
     if (set) {
-      for ( let i = 0; i < values.length; i++) {
+      for (let i = 0; i < values.length; i++) {
         set.delete(values[i]);
       }
     }

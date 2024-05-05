@@ -1,4 +1,4 @@
-import { RaftNode } from "@/core";
+import { RaftNode } from '@/core';
 import {
   AddServerRequest,
   AppendEntryRequest,
@@ -9,8 +9,8 @@ import {
   RemoveServerRequest,
   RequestVoteRequest,
   RequestVoteResponse,
-} from "@/dtos";
-import { Command, Query, Server } from "@/interfaces";
+} from '@/dtos';
+import { Command, Query, Server } from '@/interfaces';
 
 export class MemoryServer implements Server {
   private node!: RaftNode;
@@ -20,28 +20,28 @@ export class MemoryServer implements Server {
   }
 
   public async RequestVote(
-    request: RequestVoteRequest
+    request: RequestVoteRequest,
   ): Promise<RequestVoteResponse> {
     const response = await this.node.requestVoteHandler(request);
     return response;
   }
 
   public async AppendEntries(
-    request: AppendEntryRequest
+    request: AppendEntryRequest,
   ): Promise<AppendEntryResponse> {
     const response = await this.node.appendEntryHandler(request);
     return response;
   }
 
   public async AddServer(
-    request: AddServerRequest
+    request: AddServerRequest,
   ): Promise<MembershipChangeResponse> {
     const response = await this.node.addServerHandler(request);
     return response;
   }
 
   public async RemoveServer(
-    request: RemoveServerRequest
+    request: RemoveServerRequest,
   ): Promise<MembershipChangeResponse> {
     const response = await this.node.removeServerHandler(request);
     return response;
@@ -49,7 +49,7 @@ export class MemoryServer implements Server {
 
   // client requests are meant to do change to the machine's state.
   public async ClientRequest(
-    request: Command<any>
+    request: Command<any>,
   ): Promise<ClientRequestResponse> {
     return await this.node.handleClientRequest(request);
   }
