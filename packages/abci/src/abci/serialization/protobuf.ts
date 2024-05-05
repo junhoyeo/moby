@@ -17,7 +17,7 @@ export function deserialize(data: Buffer): Request[] {
 			if (index >= data.byteLength) break;
 		}
 	} catch (err) {
-		console.log('Deserialize Error:', console.error(err.message));
+		console.log('Deserialize Error:', console.error((err as Error).message));
 	}
 	return result;
 }
@@ -34,7 +34,7 @@ export function serialize(data: Response[]): Buffer {
 			size += delimiter.byteLength + msg.byteLength;
 		}
 	} catch (err) {
-		console.log('Serialize Error:', console.error(err.message));
+		console.log('Serialize Error:', console.error((err as Error).message));
 	}
 	return Buffer.concat(buf, size);
 }

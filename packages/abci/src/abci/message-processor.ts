@@ -49,10 +49,12 @@ export function processMessage(proto: Buffer): Buffer {
 	console.log('process messages', req);
 	const res: Response[] = [];
 	for (const r of req) {
-		if (processors.has(r.value.case)) {
+		if (!!r.value.case && processors.has(r.value.case)) {
 			console.log(`Processing message ${r.value.case}`, r.value.value);
 			const processor = processors.get(r.value.case);
-			res.push(processor(r));
+			if (processor) {
+				res.push(processor(r));
+			}
 		}
 	}
 	console.log('\n');

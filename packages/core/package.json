@@ -2,19 +2,22 @@
   "name": "@moby/core",
   "author": "Junho Yeo <i@junho.io>",
   "scripts": {
-    "start": "ts-node src/index",
+    "start": "tsx src/index",
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@moby/abci": "workspace:^",
     "@moby/raft": "workspace:^",
     "crypto-js": "^4.2.0",
-    "merkle": "^0.6.0"
+    "merkle": "^0.6.0",
+    "merkle-tree-gen": "^1.1.0"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
     "@types/merkle": "^0.6.4",
     "@types/node": "^20.11.30",
     "ts-node": "^10.9.2",
+    "tsx": "^4.9.1",
     "typescript": "^5.4.3"
   }
 }
