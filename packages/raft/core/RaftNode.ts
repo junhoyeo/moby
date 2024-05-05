@@ -28,6 +28,8 @@ import { getRandomTimeout } from '@/utils';
 import { membershipAddCMD, membershipRemoveCMD, noOpCMD } from './commands';
 import { STATES } from './constants';
 
+export type LogApplier = (node: RaftNode, logEntry: LogEntry) => void;
+
 export class RaftNode {
   private peers: PeerConnection[] = [];
   private state!: STATES;
@@ -36,6 +38,8 @@ export class RaftNode {
   private electionTimeout: NodeJS.Timeout | undefined;
   private heartbeatInterval: NodeJS.Timeout | undefined;
 
+  private logApplier: LogApplier;
+
   private constructor(
     private readonly id: string,
     private readonly server: Server,
@@ -43,7 +47,7 @@ export class RaftNode {
     // private readonly protocol: "RPC" | "MEMORY",
     private readonly protocol: 'MEMORY',
     private readonly leader: boolean,
-    private readonly store: Store,
+    _logApplier: LogApplier,
   ) {
     this.id = id;
     this.server = server;
@@ -52,6 +56,7 @@ export class RaftNode {
       // it will start as follower, and it will be elected leader.
       this.becomeFollower();
     }
+    this.logApplier = _logApplier;
   }
 
   public static async create(
@@ -61,6 +66,7 @@ export class RaftNode {
     // protocol: 'RPC' | 'MEMORY',
     protocol: 'MEMORY',
     leader = false,
+    logApplier: LogApplier,
   ): Promise<RaftNode> {
     await stateManager.start();
     // start the node with current configuration so it can be caught up by future leaders.
@@ -72,14 +78,7 @@ export class RaftNode {
         },
       ]);
     }
-    return new RaftNode(
-      id,
-      server,
-      stateManager,
-      protocol,
-      leader,
-      new MemoryStore(),
-    );
+    return new RaftNode(id, server, stateManager, protocol, leader, logApplier);
   }
 
   /**********************
@@ -583,22 +582,23 @@ export class RaftNode {
     return { status: false, leaderHint: leaderId };
   }
 
+  // FIXME: Deprecated this
   public handleClientQuery(query: Query): ClientQueryResponse {
     // as an improvement, we can implement only-once semantics to achieve linerazability. Sec 6.4
     const leaderId = this.stateManager.getLeaderId() ?? '';
     if (this.nodeState == STATES.LEADER) {
       let value: string | null = '';
-      switch (query.type) {
-        case QueryType.GET:
-          value = this.store.GET(query.data.key);
-          break;
-        case QueryType.HGET:
-          value = this.store.HGET(query.data.hashKey, query.data.key);
-          break;
-        case QueryType.SHAS:
-          value = this.store.SHAS(query.data.setKey, query.data.value);
-          break;
-      }
+      // switch (query.type) {
+      //   case QueryType.GET:
+      //     value = this.store.GET(query.data.key);
+      //     break;
+      //   case QueryType.HGET:
+      //     value = this.store.HGET(query.data.hashKey, query.data.key);
+      //     break;
+      //   case QueryType.SHAS:
+      //     value = this.store.SHAS(query.data.setKey, query.data.value);
+      //     break;
+      // }
       return {
         status: true,
         leaderHint: leaderId,
@@ -611,6 +611,7 @@ export class RaftNode {
       response: '',
     };
   }
+
   /**********************
    Fixed membership configurator & utils
    **********************/
@@ -631,55 +632,10 @@ export class RaftNode {
 
       for (let i = 0; i < logsToBeApplied.length; i++) {
         const log = logsToBeApplied[i];
-        this.logApplier(log);
+        this.logApplier(this, log);
         lastApplied += 1;
         this.stateManager.setLastApplied(lastApplied);
       }
-    }
-  }
-
-  private logApplier(logEntry: LogEntry) {
-    switch (logEntry.command.type) {
-      case CommandType.MEMBERSHIP_ADD:
-        console.log('MEMBERSHIP_ADD command applier');
-        if (logEntry.command.data !== this.nodeId) {
-          this.applyMembershipAdd(logEntry.command.data);
-        }
-        break;
-      case CommandType.MEMBERSHIP_REMOVE:
-        console.log('MEMBERSHIP_REMOVE command applier');
-        this.applyMembershipRemove(logEntry.command.data);
-        break;
-      case CommandType.STORE_SET:
-        console.log('STORE_SET command applier');
-        this.store.SET(logEntry.command.data.key, logEntry.command.data.value);
-        break;
-      case CommandType.STORE_DEL:
-        console.log('STORE_DEL command applier');
-        this.store.DEL(logEntry.command.data.key);
-        break;
-      case CommandType.STORE_HSET:
-        console.log('STORE_HSET command applier');
-        const hsetPairs = logEntry.command.data.pairs;
-        this.store.HSET(logEntry.command.data.hashKey, hsetPairs);
-        break;
-      case CommandType.STORE_HDEL:
-        console.log('STORE_HDEL command applier');
-        const hdelKeys = logEntry.command.data.keys;
-        this.store.HDEL(logEntry.command.data.hashKey, hdelKeys);
-        break;
-      case CommandType.STORE_SSET:
-        console.log('STORE_SSET command applier');
-        const setValues = logEntry.command.data.values;
-        this.store.SSET(logEntry.command.data.setKey, setValues);
-        break;
-      case CommandType.STORE_SDEL:
-        console.log('STORE_SDEL command applier');
-        const sdelValues = logEntry.command.data.values;
-        this.store.SDEL(logEntry.command.data.setKey, sdelValues);
-        break;
-      default:
-        console.log('UNHANDLED COMMAND', logEntry.command);
     }
   }
 }
