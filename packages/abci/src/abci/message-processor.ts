@@ -42,25 +42,21 @@ const processors: Map<string, RequestProcessor> = new Map<
 	[RequestType.setOption, setOption],
 ]);
 
-export function processMessage(req: Request): Response | undefined {
-	// const req: Request[] = deserialize(proto);
+export const processMessage = (req: Request): Response => {
 	console.log('\n');
 	console.log('process messages', req);
-	const r = req;
-	let res: Response | undefined;
-	// for (const r of req) {
-	if (!!r.value.case && processors.has(r.value.case)) {
-		console.log(`Processing message ${r.value.case}`, r.value.value);
-		const processor = processors.get(r.value.case);
-		if (processor) {
-			res = processor(r);
-		}
+
+	if (!req.value.case || !processors.has(req.value.case)) {
+		throw new Error(`Invalid request type ${req.value.case}`);
 	}
-	// }
+	console.log(`Processing message ${req.value.case}`, req.value.value);
+	const processor = processors.get(req.value.case);
+	if (!processor) {
+		throw new Error(`Processor for ${req.value.case} not found`);
+	}
+
+	const res = processor(req);
 	console.log('\n');
 	console.log('Return responses', res);
-	// for (let r of res) {
-	// 	console.log(`Response for ${r.value.case}`, r.value.value);
-	// }
 	return res;
-}
+};
