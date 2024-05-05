@@ -7,7 +7,6 @@
   },
   "dependencies": {
     "@moby/abci": "workspace:^",
-    "@moby/raft": "workspace:^",
     "crypto-js": "^4.2.0",
     "merkle": "^0.6.0",
     "merkle-tree-gen": "^1.1.0"
