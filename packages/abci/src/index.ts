@@ -12,12 +12,12 @@ export * from './abci/processors';
 // Takes an application and handles ABCI connection
 // which invoke methods on the app
 export class ABCIServer {
-	app: any;
+	// app: any;
 	server: Server;
 
-	constructor(app: any) {
+	constructor() {
 		// set the app for the socket handler
-		this.app = app;
+		// this.app = app;
 
 		// create a server by providing callback for
 		// accepting new connection and callbacks for
