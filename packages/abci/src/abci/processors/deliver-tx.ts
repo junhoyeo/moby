@@ -1,5 +1,5 @@
-import { ResponseDeliverTx } from '../../proto/ts/tendermint/abci/types_pb';
-import { Request, Response } from '../../proto/ts/tendermint/abci/types_pb';
+import { ResponseDeliverTx } from '../../proto/tendermint/abci/types_pb';
+import { Request, Response } from '../../proto/tendermint/abci/types_pb';
 import { RequestType } from '../enums';
 
 export function deliverTx(req: Request): Response {

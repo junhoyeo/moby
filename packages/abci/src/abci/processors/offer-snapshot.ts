@@ -1,5 +1,5 @@
-import { ResponseOfferSnapshot } from '../../proto/ts/tendermint/abci/types_pb';
-import { Request, Response } from '../../proto/ts/tendermint/abci/types_pb';
+import { ResponseOfferSnapshot } from '../../proto/tendermint/abci/types_pb';
+import { Request, Response } from '../../proto/tendermint/abci/types_pb';
 import { RequestType } from '../enums';
 
 export function offerSnapshot(req: Request): Response {

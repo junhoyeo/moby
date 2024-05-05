@@ -1,5 +1,5 @@
-import { ResponseEndBlock } from '../../proto/ts/tendermint/abci/types_pb';
-import { Request, Response } from '../../proto/ts/tendermint/abci/types_pb';
+import { ResponseEndBlock } from '../../proto/tendermint/abci/types_pb';
+import { Request, Response } from '../../proto/tendermint/abci/types_pb';
 import { RequestType } from '../enums';
 
 export function endBlock(req: Request): Response {

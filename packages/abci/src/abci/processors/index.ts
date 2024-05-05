@@ -11,6 +11,5 @@ export * from './init-chain';
 export * from './list-snapshots';
 export * from './load-snapshot-chunk';
 export * from './offer-snapshot';
-export * from './prepare-proposal';
-export * from './process-proposal';
 export * from './query';
+export * from './set-option';

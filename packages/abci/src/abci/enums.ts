@@ -2,6 +2,7 @@ export enum RequestType {
 	echo = 'echo',
 	flush = 'flush',
 	info = 'info',
+	setOption = 'setOption',
 	initChain = 'initChain',
 	query = 'query',
 	beginBlock = 'beginBlock',

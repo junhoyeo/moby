@@ -1,4 +1,4 @@
-import { Request, Response } from '../proto/ts/tendermint/abci/types_pb';
+import { Request, Response } from '../proto/tendermint/abci/types_pb';
 import { RequestType } from './enums';
 import {
 	applySnapshotChunk,
@@ -14,9 +14,8 @@ import {
 	listSnapshots,
 	loadSnapshotChunk,
 	offerSnapshot,
-	prepareProposal,
-	processProposal,
 	query,
+	setOption,
 } from './processors';
 import { deserialize, serialize } from './serialization/protobuf';
 
@@ -38,9 +37,8 @@ const processors: Map<string, RequestProcessor> = new Map<
 	[RequestType.listSnapshots, listSnapshots],
 	[RequestType.loadSnapshotChunk, loadSnapshotChunk],
 	[RequestType.offerSnapshot, offerSnapshot],
-	[RequestType.prepareProposal, prepareProposal],
-	[RequestType.processProposal, processProposal],
 	[RequestType.query, query],
+	[RequestType.setOption, setOption],
 ]);
 
 export function processMessage(proto: Buffer): Buffer {

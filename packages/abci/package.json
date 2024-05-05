@@ -6,16 +6,19 @@
 	"scripts": {
 		"start": "rm -rf build && tsc && node build/index.js",
 		"dev": "nodemon src/index.ts",
-		"build": "tsc"
+		"build": "tsc",
+		"codegen": "buf generate proto"
 	},
 	"license": "MIT",
-	"devDependencies": {
-		"@types/varint": "^6.0.1",
-		"nodemon": "^2.0.15",
-		"typescript": "^5.4.3"
-	},
 	"dependencies": {
-		"@bufbuild/protobuf": "^1.0.0",
+		"@bufbuild/buf": "^1.31.0",
+		"@bufbuild/protobuf": "^1.9.0",
+		"@bufbuild/protoc-gen-es": "^1.9.0",
 		"varint": "^6.0.0"
+	},
+	"devDependencies": {
+		"@types/varint": "^6.0.3",
+		"nodemon": "^3.1.0",
+		"typescript": "^5.4.5"
 	}
 }

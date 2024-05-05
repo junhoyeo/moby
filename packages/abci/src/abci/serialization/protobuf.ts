@@ -1,6 +1,6 @@
 import { decode, encode } from 'varint';
 
-import { Request, Response } from '../../proto/ts/tendermint/abci/types_pb';
+import { Request, Response } from '../../proto/tendermint/abci/types_pb';
 
 export function deserialize(data: Buffer): Request[] {
 	const result: Request[] = [];
@@ -17,7 +17,7 @@ export function deserialize(data: Buffer): Request[] {
 			if (index >= data.byteLength) break;
 		}
 	} catch (err) {
-		console.log('Deserialize Error:', console.error((err as Error).message));
+		console.log('Deserialize Error:', console.error(err as Error));
 	}
 	return result;
 }

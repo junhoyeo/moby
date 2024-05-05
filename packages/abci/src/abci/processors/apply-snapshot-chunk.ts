@@ -1,5 +1,5 @@
-import { ResponseApplySnapshotChunk } from '../../proto/ts/tendermint/abci/types_pb';
-import { Request, Response } from '../../proto/ts/tendermint/abci/types_pb';
+import { ResponseApplySnapshotChunk } from '../../proto/tendermint/abci/types_pb';
+import { Request, Response } from '../../proto/tendermint/abci/types_pb';
 import { RequestType } from '../enums';
 
 export function applySnapshotChunk(req: Request): Response {
