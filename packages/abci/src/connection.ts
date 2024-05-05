@@ -3,6 +3,7 @@ import EventEmitter from 'events';
 import { Socket } from 'net';
 import varint from 'varint';
 
+import { RequestProcessor } from './abci';
 import {
 	EmptyRequestError,
 	MaxRequestSizeError,
@@ -10,12 +11,10 @@ import {
 } from './errors';
 import { Request, Response } from './proto/tendermint/abci/types_pb';
 
-export type RequestHandler = (req: Request) => Response;
-
 export class Connection extends EventEmitter {
 	id: number;
 	socket: Socket;
-	handleRequest: RequestHandler;
+	handleRequest: RequestProcessor;
 	readerBuffer: BufferList;
 	isReading: boolean;
 	isClosing: boolean;
@@ -28,7 +27,7 @@ export class Connection extends EventEmitter {
 	 * @param {Socket} socket
 	 * @param {Function} handleRequest
 	 */
-	constructor(id: number, socket: Socket, handleRequest: RequestHandler) {
+	constructor(id: number, socket: Socket, handleRequest: RequestProcessor) {
 		super();
 
 		this.id = id;

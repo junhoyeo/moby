@@ -1,5 +1,10 @@
 import { createABCIServer } from '@moby/abci';
 
-// console.log(abci);
-var appServer = createABCIServer();
-appServer.listen(26658);
+import { processMessage } from './message-processor';
+
+const app = {
+  processMessage,
+};
+
+const server = createABCIServer(app);
+server.listen(26658);
